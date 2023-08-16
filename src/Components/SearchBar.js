@@ -3,6 +3,7 @@ import "./SearchBar.css";
 import { FaSearch } from "react-icons/fa";
 
 export const SearchBar = ({ result, setResult }) => {
+
   const [input, setInput] = useState("");
 
   const fetchData = (value) => {
@@ -20,11 +21,14 @@ export const SearchBar = ({ result, setResult }) => {
         setResult(results);
       });
   };
+
   const handlerChange = (e) => {
     const { value } = e.target;
+
     setInput(value);
     fetchData(value);
   };
+
   return (
     <div className="serach_bar_container">
       <div className="input_container">
@@ -37,7 +41,6 @@ export const SearchBar = ({ result, setResult }) => {
         />
       </div>
 
-      {/* search_Result_List */}
       <div className="result_list">
         {result.map((data, i) => {
           return (
