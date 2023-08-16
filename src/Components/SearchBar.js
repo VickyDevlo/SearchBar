@@ -1,13 +1,14 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./SearchBar.css";
 import { FaSearch } from "react-icons/fa";
 
 export const SearchBar = ({ result, setResult }) => {
+    const ref = useRef(null);
     const [input, setInput] = useState("");
 
     const fetchData = (value) => {
         fetch("https://jsonplaceholder.typicode.com/users")
-            .then((response) => response.json())
+            .then((res) => res.json())
             .then((json) => {
                 const results = json.filter((user) => {
                     return (
@@ -21,8 +22,13 @@ export const SearchBar = ({ result, setResult }) => {
             });
     };
 
+    useEffect(() => {
+        ref.current.focus();
+    }, []);
+
     const handlerChange = (e) => {
         const { value } = e.target;
+
         setInput(value);
         fetchData(value);
     };
@@ -32,6 +38,7 @@ export const SearchBar = ({ result, setResult }) => {
             <div className="input_container">
                 <FaSearch id="serach_icon" />
                 <input
+                    ref={ref}
                     type="text"
                     placeholder="Type to serach..."
                     value={input}
