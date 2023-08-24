@@ -2,59 +2,77 @@ import React, { useEffect, useRef, useState } from "react";
 import "./SearchBar.css";
 import { FaSearch } from "react-icons/fa";
 
-export const SearchBar = ({ result, setResult }) => {
-    const ref = useRef(null);
-    const [input, setInput] = useState("");
+export const SearchBar = () => {
+  const [result, setResult] = useState([]);
+  const [filterData, setFilterData] = useState([]);
+  const [searchText, setSearchText] = useState("");
+  const [searchMessage, setSearchMessage] = useState("");
 
-    const fetchData = (value) => {
-        fetch("https://jsonplaceholder.typicode.com/users")
-            .then((res) => res.json())
-            .then((json) => {
-                const results = json.filter((user) => {
-                    return (
-                        value &&
-                        user &&
-                        user.name &&
-                        user.name.toLowerCase().includes(value)
-                    );
-                });
-                setResult(results);
-            });
-    };
+  const inputRef = useRef();
 
-    useEffect(() => {
-        ref.current.focus();
-    }, []);
+  useEffect(() => {
+    fetch("https://jsonplaceholder.typicode.com/users")
+      .then((res) => res.json())
+      .then((data) => {
+        setResult(data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
 
-    const handlerChange = (e) => {
-        const { value } = e.target;
+    inputRef.current.focus();
+  }, []);
 
-        setInput(value);
-        fetchData(value);
-    };
-
-    return (
-        <div className="serach_bar_container">
-            <div className="input_container">
-                <FaSearch id="serach_icon" />
-                <input
-                    ref={ref}
-                    type="text"
-                    placeholder="Type to serach..."
-                    value={input}
-                    onChange={handlerChange}
-                />
-            </div>
-
-            <div className="result_list">
-                {result.map((data, i) => {
-                    return (
-                        <div key={i} className="search_result">
-                            {data.name}
-                        </div>
-                    );
-                })}
-            </div>
-        </div>
+  const onchangeHandler = (e) => {
+    const { value } = e.target;
+    setSearchText(value);
+    const filteredData = result.filter((f_data) =>
+      f_data.name.toLowerCase().includes(value.toLowerCase())
     );
+    setFilterData(filteredData);
+
+    if (value === "") {
+      setSearchMessage("Please enter a name for search.");
+    } else if (filteredData.length === 0) {
+      setSearchMessage("No name found.");
+    } else {
+      setSearchMessage("");
+    }
+  };
+
+  const clickHandle = (name) => {
+    setSearchText(name);
+    setFilterData([]);
+  };
+
+  return (
+    <div className="search_bar_container">
+      <div className="input_container">
+        <FaSearch id="search_icon" />
+        <input
+          ref={inputRef}
+          type="text"
+          placeholder="Enter the name for search..."
+          value={searchText}
+          onChange={onchangeHandler}
+        />
+      </div>
+
+      {searchMessage && <h1 className="search_message">{searchMessage}</h1>}
+
+      {searchText.length > 0 && (
+        <div className="result_list">
+          {filterData.map((data) => (
+            <div
+              className="search_result"
+              key={data.id}
+              onClick={() => clickHandle(data.name)}
+            >
+              {data.name}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 };
